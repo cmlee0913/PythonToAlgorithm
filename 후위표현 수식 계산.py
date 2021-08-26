@@ -54,28 +54,27 @@ def infixToPostfix(tokenList):
 
     opStack = ArrayStack()
     postfixList = []
-    
-    for element in tokenList:
-        if type(element) is int:
-            postfixList.append(element)
-        if element == '(':
-            opStack.push(element)
-        if element == ')':
+    for c in tokenList:
+        if c == '(':
+            opStack.push(c)
+        elif c == ')':
             while opStack.peek() != '(':
                 postfixList.append(opStack.pop())
             opStack.pop()
-        if element in ['*','+','-','/','(',')']:
-            if opStack.isEmpty():
-                opStack.push(element)
+        else:
+            if c in prec:
+                if opStack.isEmpty():
+                    opStack.push(c)
+                elif prec[opStack.peek()] >= prec[c]:
+                    while not opStack.isEmpty() and prec[opStack.peek()] >= prec[c]:
+                        postfixList.append(opStack.pop())
+                    opStack.push(c)
+                else:
+                    opStack.push(c)
             else:
-                while prec[opStack.peek()] >= prec[element]:
-                    postfixList.append(opStack.pop())
-                    if opStack.isEmpty():
-                        break
-                opStack.push(element)
+                postfixList.append(c)
     while not opStack.isEmpty():
         postfixList.append(opStack.pop())
-        
     return postfixList
 
 
@@ -87,11 +86,30 @@ def postfixEval(tokenList):
         if element not in ['*','+','-','/']:
             opStack.push(element)
         if element in ['*','+','-','/']:
-            value = opStack.pop() * opStack.pop()
-            opStack.push(value)
+            if element == '+':
+                first_popdata = opStack.pop()
+                second_popdata = opStack.pop()
+                temp = first_popdata + second_popdata
+                opStack.push(temp)
+            elif element == '-':
+                first_popdata = opStack.pop()
+                second_popdata = opStack.pop()
+                temp = second_popdata - first_popdata
+                opStack.push(temp)
+            elif element == '*':
+                first_popdata = opStack.pop()
+                second_popdata = opStack.pop()
+                temp = first_popdata * second_popdata
+                opStack.push(temp)
+            elif element == '/':
+                first_popdata = opStack.pop()
+                second_popdata = opStack.pop()
+                temp = second_popdata / first_popdata
+                opStack.push(temp)
             
     return opStack.pop()
-        
+
+
 def solution(expr):
     tokens = splitTokens(expr)
     postfix = infixToPostfix(tokens)
