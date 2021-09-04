@@ -34,7 +34,18 @@ class BinaryTree:
 
 
     def bft(self):
-        return []
+        traversal = []
+        q = ArrayQueue()
+        if self.root:
+            q.enqueue(self.root)
+        while not q.isEmpty():
+            node = q.dequeue()
+            traversal.append(node.data)
+            if node.left:
+                q.enqueue(node.left)
+            if node.right:
+                q.enqueue(node.right)
+        return traversal
 
 
 def solution(x):
